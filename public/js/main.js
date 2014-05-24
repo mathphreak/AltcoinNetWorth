@@ -6,7 +6,7 @@ var color = d3.scale.ordinal().range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"
 
 var arc = d3.svg.arc().outerRadius(radius - 10).innerRadius(0);
 
-var pie = d3.layout.pie().sort(null).value(function(d) { return d.BtcValue; });
+var pie = d3.layout.pie().sort(null).value(function(d) { return parseFloat(d.BtcValue); });
 
 var svg = d3.select("#graph-container").append("svg").attr("width", width).attr("height", height)
             .append("g").attr("transform", "translate(" + width/2 + "," + height/2 + ")");

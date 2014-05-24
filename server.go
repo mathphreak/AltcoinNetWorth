@@ -6,26 +6,16 @@ import (
 	"github.com/go-martini/martini"
 	"github.com/martini-contrib/render"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"strconv"
 )
 
-func round(rawValue float64, decimalPlaces int) float64 {
-	scale := math.Pow10(decimalPlaces)
-	return math.Trunc(rawValue*scale) / scale // TODO don't naively use floor
+func stringifyFiatValue(rawValue float64) string {
+	return strconv.FormatFloat(rawValue, 'f', 2, 64)
 }
 
-func roundFiatValue(rawValue float64) float64 {
-	return round(rawValue, 2)
-}
-
-func roundBTCValue(rawValue float64) float64 {
-	return round(rawValue, 8)
-}
-
-func stringify(value float64) string {
-	return strconv.FormatFloat(value, 'f', -1, 64)
+func stringifyBTCValue(rawValue float64) string {
+	return strconv.FormatFloat(rawValue, 'f', 8, 64)
 }
 
 func getBTCPrice() (result float64, err error) {
@@ -68,36 +58,38 @@ type rawCoin struct {
 type fullCoin struct {
 	Name     string
 	Abbr     string
-	Quantity float64
-	BtcValue float64
-	UsdValue float64
+	Quantity string
+	BtcValue string
+	UsdValue string
 }
 
 type templateData struct {
-	BtcNetWorth float64
-	UsdNetWorth float64
+	BtcNetWorth string
+	UsdNetWorth string
 	CoinValues  []fullCoin
 }
 
 func makeTemplateData(coins []rawCoin) templateData {
 	result := templateData{}
+	btcNetWorth := 0.0
+	usdNetWorth := 0.0
 	for _, coin := range coins {
 		resultCoin := fullCoin{}
 		resultCoin.Name = coin.Name
 		resultCoin.Abbr = coin.Abbr
-		resultCoin.Quantity = coin.Quantity
+		resultCoin.Quantity = stringifyBTCValue(coin.Quantity)
 		btcPrice, _ := getPrice(coin.Abbr)
 		btcValue := btcPrice * coin.Quantity
-		resultCoin.BtcValue = roundBTCValue(btcValue)
+		resultCoin.BtcValue = stringifyBTCValue(btcValue)
 		priceOfBTC, _ := getBTCPrice()
 		usdValue := btcValue * priceOfBTC
-		resultCoin.UsdValue = roundFiatValue(usdValue)
-		result.BtcNetWorth += btcValue
-		result.UsdNetWorth += usdValue
+		resultCoin.UsdValue = stringifyFiatValue(usdValue)
+		btcNetWorth += btcValue
+		usdNetWorth += usdValue
 		result.CoinValues = append(result.CoinValues, resultCoin)
 	}
-	result.BtcNetWorth = roundBTCValue(result.BtcNetWorth)
-	result.UsdNetWorth = roundFiatValue(result.UsdNetWorth)
+	result.BtcNetWorth = stringifyBTCValue(btcNetWorth)
+	result.UsdNetWorth = stringifyFiatValue(usdNetWorth)
 	return result
 }
 
@@ -126,7 +118,7 @@ func main() {
 			if err != nil {
 				return 500, "ERROR: " + err.Error()
 			}
-			return 200, "Price of BTC is $" + stringify(roundFiatValue(price))
+			return 200, "Price of BTC is $" + stringifyFiatValue(price)
 		})
 
 		r.Get("/:coin", func(params martini.Params) (int, string) {
@@ -134,7 +126,7 @@ func main() {
 			if err != nil {
 				return 500, "ERROR: " + err.Error()
 			}
-			return 200, "Price of " + params["coin"] + " is " + stringify(roundBTCValue(price))
+			return 200, "Price of " + params["coin"] + " is " + stringifyBTCValue(price)
 		})
 	})
 
@@ -145,7 +137,7 @@ func main() {
 			if err != nil {
 				return 500, "ERROR: " + err.Error()
 			}
-			return 200, "Value of " + params["count"] + " BTC is $" + stringify(roundFiatValue(price*count))
+			return 200, "Value of " + params["count"] + " BTC is $" + stringifyFiatValue(price*count)
 		})
 
 		r.Get("/:coin/:count", func(params martini.Params) (int, string) {
@@ -154,7 +146,7 @@ func main() {
 			if err != nil {
 				return 500, "ERROR: " + err.Error()
 			}
-			return 200, "Value of " + params["count"] + " " + params["coin"] + " is " + stringify(roundBTCValue(price*count)) + " BTC"
+			return 200, "Value of " + params["count"] + " " + params["coin"] + " is " + stringifyBTCValue(price*count) + " BTC"
 		})
 	})
 
