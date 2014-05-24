@@ -101,6 +101,14 @@ func makeTemplateData(coins []rawCoin) templateData {
 	return result
 }
 
+func loadData() []rawCoin {
+	filename := "data.json"
+	rawData, _ := ioutil.ReadFile(filename) // TODO don't discard this error
+	var result []rawCoin
+	json.Unmarshal(rawData, &result) // TODO or this error
+	return result
+}
+
 func main() {
 	type coinbasePrice struct {
 		amount   float64
@@ -151,7 +159,7 @@ func main() {
 	})
 
 	m.Get("/", func(r render.Render) {
-		r.HTML(200, "index", makeTemplateData([]rawCoin{rawCoin{"Bitcoin", "BTC", 0.01512}, rawCoin{"Dogecoin", "DOGE", 115023}}))
+		r.HTML(200, "index", makeTemplateData(loadData()))
 	})
 
 	m.Run()
