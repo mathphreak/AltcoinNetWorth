@@ -77,7 +77,6 @@ type templateData struct {
 	BtcNetWorth float64
 	UsdNetWorth float64
 	CoinValues  []fullCoin
-	FullData    string
 }
 
 func makeTemplateData(coins []rawCoin) templateData {
@@ -99,8 +98,6 @@ func makeTemplateData(coins []rawCoin) templateData {
 	}
 	result.BtcNetWorth = roundBTCValue(result.BtcNetWorth)
 	result.UsdNetWorth = roundFiatValue(result.UsdNetWorth)
-	resultAsJSON, _ := json.Marshal(result)
-	result.FullData = string(resultAsJSON)
 	return result
 }
 
