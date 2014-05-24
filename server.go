@@ -110,10 +110,15 @@ func main() {
 	m := martini.Classic()
 	m.Use(render.Renderer(render.Options{
 		Extensions: []string{".html"},
+		Layout:     "layout",
 	}))
 
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", makeTemplateData(loadData()))
+	})
+
+	m.Get("/edit", func(r render.Render) {
+		r.HTML(200, "edit", makeTemplateData(loadData()))
 	})
 
 	m.Run()
