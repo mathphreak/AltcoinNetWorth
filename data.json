@@ -8,5 +8,25 @@
         "Name": "Dogecoin",
         "Abbr": "DOGE",
         "Quantity": 117635.96973869
+    },
+    {
+        "Name": "Orangecoin",
+        "Abbr": "OC",
+        "Quantity": 20345.200942
+    },
+    {
+        "Name": "Sync",
+        "Abbr": "SYNC",
+        "Quantity": 0.00697811
+    },
+    {
+        "Name": "AVcoin",
+        "Abbr": "AV",
+        "Quantity": 907.78245177
+    },
+    {
+        "Name": "Citizencoin",
+        "Abbr": "CTZ",
+        "Quantity": 4593.246902
     }
 ]
