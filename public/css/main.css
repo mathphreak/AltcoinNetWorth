@@ -4,7 +4,13 @@
    Author's custom styles
    ========================================================================== */
 
+td, th {
+    text-align: right;
+}
 
+td:first-child, th:first-child {
+    text-align: left;
+}
 
 
 
