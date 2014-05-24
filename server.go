@@ -112,44 +112,6 @@ func main() {
 		Extensions: []string{".html"},
 	}))
 
-	m.Group("/prices", func(r martini.Router) {
-		r.Get("/BTC", func() (int, string) {
-			price, err := getBTCPrice()
-			if err != nil {
-				return 500, "ERROR: " + err.Error()
-			}
-			return 200, "Price of BTC is $" + stringifyFiatValue(price)
-		})
-
-		r.Get("/:coin", func(params martini.Params) (int, string) {
-			price, err := getPrice(params["coin"])
-			if err != nil {
-				return 500, "ERROR: " + err.Error()
-			}
-			return 200, "Price of " + params["coin"] + " is " + stringifyBTCValue(price)
-		})
-	})
-
-	m.Group("/value", func(r martini.Router) {
-		r.Get("/BTC/:count", func(params martini.Params) (int, string) {
-			count, err := strconv.ParseFloat(params["count"], 64)
-			price, err := getBTCPrice()
-			if err != nil {
-				return 500, "ERROR: " + err.Error()
-			}
-			return 200, "Value of " + params["count"] + " BTC is $" + stringifyFiatValue(price*count)
-		})
-
-		r.Get("/:coin/:count", func(params martini.Params) (int, string) {
-			count, err := strconv.ParseFloat(params["count"], 64)
-			price, err := getPrice(params["coin"])
-			if err != nil {
-				return 500, "ERROR: " + err.Error()
-			}
-			return 200, "Value of " + params["count"] + " " + params["coin"] + " is " + stringifyBTCValue(price*count) + " BTC"
-		})
-	})
-
 	m.Get("/", func(r render.Render) {
 		r.HTML(200, "index", makeTemplateData(loadData()))
 	})
